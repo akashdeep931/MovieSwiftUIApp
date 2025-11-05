@@ -54,9 +54,9 @@ struct HomeView: View {
                         }
                         
                         HorizontalListView(header: Constants.trendingMovieString, titles: viewModel.trendingMovies)
-    //                    HorizontalListView(header: Constants.trendingTVString)
-    //                    HorizontalListView(header: Constants.topRatedMovieString)
-    //                    HorizontalListView(header: Constants.topRatedTVString)
+                        HorizontalListView(header: Constants.trendingTVString, titles: viewModel.trendingTV)
+                        HorizontalListView(header: Constants.topRatedMovieString, titles: viewModel.topRatedMovies)
+                        HorizontalListView(header: Constants.topRatedTVString, titles: viewModel.topRatedTV)
                     }
                 case .failed(underlyingError: let error):
                     Text("Error: \(error.localizedDescription)")
