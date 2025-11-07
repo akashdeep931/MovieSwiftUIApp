@@ -28,17 +28,7 @@ struct HorizontalListView: View {
                                     .scaledToFit()
                                     .clipShape(RoundedRectangle(cornerRadius: 20))
                             case .failure:
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.gray.opacity(0.3))
-                                    .overlay {
-                                        VStack {
-                                            Image(systemName: "photo.fill")
-                                                .foregroundStyle(.gray)
-                                            Text("No Image")
-                                                .font(.caption)
-                                                .foregroundStyle(.gray)
-                                        }
-                                    }
+                                FailedImagePhasePlaceholder()
                             @unknown default:
                                 EmptyView()
                             }

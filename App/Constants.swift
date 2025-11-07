@@ -19,6 +19,8 @@ struct Constants {
     static let topRatedMovieString = "Top Rated Movies"
     static let topRatedTVString = "Top Rated TV"
     
+    static let imageUnavailable = "Image unavailable"
+    
     static let homeIconString = "house"
     static let upcomingIconString = "play.circle"
     static let searchIconString = "magnifyingglass"

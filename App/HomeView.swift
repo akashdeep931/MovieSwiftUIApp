@@ -40,18 +40,7 @@ struct HomeView: View {
                                     }
                                     .frame(width: geo.size.width, height: geo.size.height * 0.80)
                             case .failure:
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .overlay {
-                                        VStack {
-                                            Image(systemName: "photo.fill")
-                                                .font(.system(size: 60))
-                                                .foregroundStyle(.gray)
-                                            Text("Image unavailable")
-                                                .foregroundStyle(.gray)
-                                        }
-                                    }
-                                    .frame(width: geo.size.width, height: geo.size.height * 0.80)
+                                FailedImagePhasePlaceholder(width: geo.size.width, height: geo.size.height * 0.80)
                             @unknown default:
                                 EmptyView()
                             }
@@ -80,6 +69,7 @@ struct HomeView: View {
                     }
                 case .failed(underlyingError: let error):
                     Text("Error: \(error.localizedDescription)")
+                        .frame(width: geo.size.width, height: geo.size.height * 0.80)
                 }
             }
             .task{
