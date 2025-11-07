@@ -25,18 +25,23 @@ class ViewModel {
     
     public func getTitles() async {
         homeStatus = .fetching
-        
-        do {
-            trendingMovies = try await dataFetcher.fetchTitles(for: "movie", by: "trending")
-            trendingTV = try await dataFetcher.fetchTitles(for: "tv", by: "trending")
-            topRatedMovies = try await dataFetcher.fetchTitles(for: "movie", by: "top_rated")
-            topRatedTV = try await dataFetcher.fetchTitles(for: "tv", by: "top_rated")
-            
+        if trendingMovies.isEmpty {
+            do {
+                async let tMovies = dataFetcher.fetchTitles(for: "movie", by: "trending")
+                async let tTV = dataFetcher.fetchTitles(for: "tv", by: "trending")
+                async let tRMovies = dataFetcher.fetchTitles(for: "movie", by: "top_rated")
+                async let tRTV = dataFetcher.fetchTitles(for: "tv", by: "top_rated")
+                
+                (trendingMovies, trendingTV, topRatedMovies, topRatedTV) = try await (tMovies, tTV, tRMovies, tRTV)
+                
+                homeStatus = .success
+            } catch {
+                print("An error has occurred while fetching data: \(error.localizedDescription)")
+                
+                homeStatus = .failed(underlyingError: error)
+            }
+        } else {
             homeStatus = .success
-        } catch {
-            print("An Error has occured while fetching data \(error.localizedDescription)")
-            
-            homeStatus = .failed(underlyingError: error)
         }
     }
 }

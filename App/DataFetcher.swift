@@ -15,8 +15,10 @@ struct DataFetcher {
         guard let url = try buildURL(media: media, type: type) else {
             throw NetworkError.urlBuildFailed
         }
-                
+
         let(data, urlResponse) = try await URLSession.shared.data(from: url)
+        
+        print("after run \(urlResponse)")
         
         guard let response = urlResponse as? HTTPURLResponse, response.statusCode == 200 else {
             throw NetworkError.badURLResponse(underlyingError: NSError(

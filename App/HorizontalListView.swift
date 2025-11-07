@@ -18,13 +18,30 @@ struct HorizontalListView: View {
             ScrollView(.horizontal) {
                 LazyHStack {
                     ForEach(titles) { title in
-                        AsyncImage(url: URL(string: title.posterPath ?? "")){ image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                        } placeholder: {
-                            ProgressView()
+                        AsyncImage(url: URL(string: title.posterPath ?? "")) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                            case .failure:
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.gray.opacity(0.3))
+                                    .overlay {
+                                        VStack {
+                                            Image(systemName: "photo.fill")
+                                                .foregroundStyle(.gray)
+                                            Text("No Image")
+                                                .font(.caption)
+                                                .foregroundStyle(.gray)
+                                        }
+                                    }
+                            @unknown default:
+                                EmptyView()
+                            }
                         }
                         .frame(width: 120, height: 200)
                     }

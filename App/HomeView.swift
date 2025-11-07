@@ -19,23 +19,43 @@ struct HomeView: View {
                     EmptyView()
                 case .fetching:
                     ProgressView()
+                        .frame(width: geo.size.width, height: geo.size.height)
                 case .success:
                     LazyVStack {
-                        AsyncImage(url: URL(string: heroTestTitle)){ image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .overlay {
-                                    LinearGradient(
-                                        stops: [Gradient.Stop(color: .clear, location: 0.8),
-                                                Gradient.Stop(color: .gradient, location: 1)],
-                                        startPoint: .top,
-                                        endPoint: .bottom)
-                                }
-                        } placeholder: {
-                            ProgressView()
+                        AsyncImage(url: URL(string: heroTestTitle)) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(width: geo.size.width, height: geo.size.height * 0.80)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .overlay {
+                                        LinearGradient(
+                                            stops: [Gradient.Stop(color: .clear, location: 0.8),
+                                                    Gradient.Stop(color: .gradient, location: 1)],
+                                            startPoint: .top,
+                                            endPoint: .bottom)
+                                    }
+                                    .frame(width: geo.size.width, height: geo.size.height * 0.80)
+                            case .failure:
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .overlay {
+                                        VStack {
+                                            Image(systemName: "photo.fill")
+                                                .font(.system(size: 60))
+                                                .foregroundStyle(.gray)
+                                            Text("Image unavailable")
+                                                .foregroundStyle(.gray)
+                                        }
+                                    }
+                                    .frame(width: geo.size.width, height: geo.size.height * 0.80)
+                            @unknown default:
+                                EmptyView()
+                            }
                         }
-                        .frame(width: geo.size.width, height: geo.size.height * 0.85)
                         
                         HStack {
                             Button {
