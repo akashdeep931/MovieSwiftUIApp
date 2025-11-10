@@ -63,21 +63,29 @@ struct HomeView: View {
                                 }
                             }
                             
-                            HorizontalListView(header: Constants.trendingMovieString, titles: viewModel.trendingMovies)
-                            HorizontalListView(header: Constants.trendingTVString, titles: viewModel.trendingTV)
-                            HorizontalListView(header: Constants.topRatedMovieString, titles: viewModel.topRatedMovies)
-                            HorizontalListView(header: Constants.topRatedTVString, titles: viewModel.topRatedTV)
+                            HorizontalListView(header: Constants.trendingMovieString, titles: viewModel.trendingMovies) { title in
+                                titleDetailPath.append(title)
+                            }
+                            HorizontalListView(header: Constants.trendingTVString, titles: viewModel.trendingTV) { title in
+                                titleDetailPath.append(title)
+                            }
+                            HorizontalListView(header: Constants.topRatedMovieString, titles: viewModel.topRatedMovies) { title in
+                                titleDetailPath.append(title)
+                            }
+                            HorizontalListView(header: Constants.topRatedTVString, titles: viewModel.topRatedTV) { title in
+                                titleDetailPath.append(title)
+                            }
                         }
                     case .failed(underlyingError: let error):
                         Text("Error: \(error.localizedDescription)")
                             .frame(width: geo.size.width, height: geo.size.height * 0.85)
                     }
                 }
-                .navigationDestination(for: Title.self) { title in
-                    TitleDetailView(title: title)
-                }
                 .task{
                     await viewModel.getTitles()
+                }
+                .navigationDestination(for: Title.self) { title in
+                    TitleDetailView(title: title)
                 }
             }
         }

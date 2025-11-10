@@ -15,7 +15,7 @@ struct TitleDetailView: View {
     var body: some View {
         GeometryReader { geo in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
+                LazyVStack(alignment: .leading) {
                     AsyncImage(url: URL(string: title.posterPath ?? "")) { phase in
                         switch phase {
                         case .empty:
@@ -35,10 +35,11 @@ struct TitleDetailView: View {
                     Text((title.name ?? title.title) ?? "")
                         .bold()
                         .font(.title2)
-                        .padding(5)
+                        .padding(.horizontal, 5)
                     
                     Text(title.overview ?? "")
                         .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
                 }
             }
         }
