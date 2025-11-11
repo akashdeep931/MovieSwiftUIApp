@@ -10,30 +10,21 @@ import Foundation
 struct DataFetcher {
     let tmdbBaseURL = APIConfig.shared?.tmdbBaseURL
     let tmdbAPIKey = APIConfig.shared?.tmdbAPIKey
+    let youtubeSearchURL = APIConfig.shared?.youtubeSearchURL
+    let youtubeAPIKey = APIConfig.shared?.youtubeAPIKey
     
     public func fetchTitles(for media:String, by type:String) async throws -> [Title] {
         guard let url = try buildURL(media: media, type: type) else {
             throw NetworkError.urlBuildFailed
         }
 
-        let(data, urlResponse) = try await URLSession.shared.data(from: url)
+        var titles = try await fetchAndDecode(url: url, type: TMDBAPIObject.self).results
         
-        guard let response = urlResponse as? HTTPURLResponse, response.statusCode == 200 else {
-            throw NetworkError.badURLResponse(underlyingError: NSError(
-                domain: "DataFetcher",
-                code: (urlResponse as? HTTPURLResponse)?.statusCode ?? -1,
-                userInfo: [NSLocalizedDescriptionKey: "Invalid HTTP Response"]))
-        }
-        
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        
-        var titles = try decoder.decode(APIObject.self, from: data).results
         Constants.addPosterPath(to: &titles)
         return titles
     }
     
-    private func buildURL(media:String, type:String) throws -> URL? {
+    private func buildURL(media: String, type: String) throws -> URL? {
         guard let baseURL = tmdbBaseURL else {
             throw NetworkError.missingConfig
         }
@@ -60,5 +51,42 @@ struct DataFetcher {
         }
         
         return fetchTitlesURL
+    }
+    
+    public func fetchVideoId(for title: String) async throws -> String {
+        guard let baseSearchURL = youtubeSearchURL else {
+            throw NetworkError.missingConfig
+        }
+        
+        guard let searchAPIKey = youtubeAPIKey else {
+            throw NetworkError.missingConfig
+        }
+        
+        let trailerSearch = title + YoutubeURLString.space.rawValue + YoutubeURLString.trailer.rawValue
+        
+        guard let fetchVideoURL = URL(string: baseSearchURL)?.appending(queryItems: [
+            URLQueryItem(name: YoutubeURLString.quertShorten.rawValue, value: trailerSearch),
+            URLQueryItem(name: YoutubeURLString.key.rawValue, value: searchAPIKey)
+        ]) else {
+            throw NetworkError.urlBuildFailed
+        }
+        
+        return try await fetchAndDecode(url: fetchVideoURL, type: YoutubeSearchResponse.self).items?.first?.id?.videoId ?? ""
+    }
+    
+    private func fetchAndDecode<T: Decodable>(url: URL, type: T.Type) async throws -> T {
+        let(data, urlResponse) = try await URLSession.shared.data(from: url)
+        
+        guard let response = urlResponse as? HTTPURLResponse, response.statusCode == 200 else {
+            throw NetworkError.badURLResponse(underlyingError: NSError(
+                domain: "DataFetcher",
+                code: (urlResponse as? HTTPURLResponse)?.statusCode ?? -1,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid HTTP Response"]))
+        }
+        
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        return try decoder.decode(type, from: data)
     }
 }
