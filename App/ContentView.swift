@@ -13,6 +13,7 @@ struct ContentView: View {
                 SearchView()
             }
             Tab(Constants.dowloadString, systemImage: Constants.downloadIconString){
+                DowloadView()
             }
         }
     }
